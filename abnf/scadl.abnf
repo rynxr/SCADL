@@ -1,0 +1,34 @@
+program   = 1*(comment/def/evaluate)
+comment   = "//" *VCHAR "\n"
+def       = %s"let" SVID "=" sv-expr) ";" / %s"let" CVID "=" cv-expr ";" / %s"$input" "(" vid ")" ";" / %s"let" fid "(" fargs ")=" block-st
+evaluate  = %s"eval" output-st ";"
+v-expr    = sv-expr / cv-expr
+sv-expr   = const-v / "(" sv-expr ")" / SVID  / SFID "(" rargs ")" / sitem / (sv-uops sv-expr) / (sv-expr sv-bops sv-expr)
+sv-bops   = "*^" / "*" / "/" / "%" / "+" / "-" / "==" / "!=" / "<"/"<="/">"/">=" / "&" / "|" /  "^"  / "&&" / "||" sv-uops   = "~" / "!"
+cv-expr   = CVID / bitems / CFID "(" rargs ")" / cv-init / "(" cv-expr ")" / (cv-uops cv-expr) / (cv-expr cv-bops cv-expr)
+cv-bops   = "*@^"/"*@"/"+"/"-"/"*"/"/"/"%" /"&"/"|"/"^"/"@>"/"@<"/"@-"/"@|"
+cv-uops   = "@-|" / "@~"
+bitems    = CVID "[" br 2("," br) "]"
+litems    = CVID "[" 2(lr ",") br "]"
+sitem     = CVID "[" 2(sv-expr ",") br "]"
+cvinit    = "C" "[" 2(sv-expr ",") br "]" "." "[" 1*(sv-expr/litems) "]"
+br        = sv-expr ":" sv-expr
+lr        = sv-expr ".." sv-expr
+fargs     = [vid *("," vid)]
+rargs     = [v-expr *("," v-expr)]
+block-st  = %s"begin" 1*(stmt) %s"end"
+stmt      = def / output-st / if-st / loop-st / v-expr / block-st /";"
+output-st = %s"$output" "(" vid ");"
+if-st     = %s"if" sv-expr block-st *(%s"else" block-st)
+loop-st   = %s("loopup"/"loopdown") block-st
+const-v   = ("0x" 1*(HEXDIG)) / %x30 / (%x31-39 *%x30-39)
+vid       = SVID / CVID
+fid       = SFID / CFID
+SVID      = %s"v" (ALPHA/"_") *(ALPHA/DIGIT/"_")
+CVID      = %s"V" (ALPHA/"_") *(ALPHA/DIGIT/"_")
+SFID      = %s"f" (ALPHA/"_") *(ALPHA/DIGIT/"_")
+CFID      = %s"F" (ALPHA/"_") *(ALPHA/DIGIT/"_")
+HEXDIG    = DIGIT / %x41-46 / %x61-66
+ALPHA     = %x41-5A / %x61-7A
+DIGIT     = %x30-39
+VCHAR     = %x20-7E / %x09
