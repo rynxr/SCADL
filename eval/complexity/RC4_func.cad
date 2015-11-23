@@ -1,0 +1,19 @@
+// 17lines: refer to ../RC4_func.cad, remove all blanks, comments and inputs
+// Note: cryptol RC4 only implements KSA
+let FKsa(VK,vlen) = begin
+  let VState = M[1,256,8].[0];
+  let VT = M[1,1,8].[0];
+  let Vj = M[1,257,8].[0];
+  loopup(vi=255) begin
+    set VState[0,vi,7:0] = vi
+  end;
+  loopup(vi=255) begin
+    set Vj[0,vi+1,7:0] = (Vj[0,vi,7:0] + VState[0,vi,7:0] + VK[0,vi % vlen,7:0]) % 256;
+	set VT[0,0,7:0] = VState[0,vi,7:0];
+	set VState[0,vi,7:0] = VState[0,Vj[0,vi+1,7:0],7:0];
+	set VState[0,Vj[0,vi+1,7:0],7:0] = VT[0,0,7:0];
+  end;
+  VState
+end
+let VRes = FKsa(VKey, 3);
+eval $output(VRes);

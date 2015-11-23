@@ -1,0 +1,20 @@
+Loading module Cryptol
+Loading module Cryptol
+Loading module DES
+[warning] at ./DES.cry:17:1--23:37:
+  Defaulting type parameter 'bits'
+             of literal or demoted expression
+             at ./DES.cry:23:35--23:36
+  to 5
+[[0x8ca64de9c1b123a7, 0x8ca64de9c1b123a7, 0x869efd7f9f265a09,
+  0x869efd7f9f265a09],
+ [0x166b40b44aba4bd6, 0x166b40b44aba4bd6, 0x20b9290d0ea8e3d8,
+  0x20b9290d0ea8e3d8],
+ [0x06e7ea22ce92708f, 0x06e7ea22ce92708f, 0x050a9dc3fc0189ac,
+  0x050a9dc3fc0189ac],
+ [0x4eb190c9a2fa169c, 0x4eb190c9a2fa169c, 0x382039c55fa7e90d,
+  0x382039c55fa7e90d]]
+
+real	0m0.613s
+user	0m0.364s
+sys	0m0.034s

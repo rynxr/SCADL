@@ -1,0 +1,20 @@
+INFO: evaluate DES/AES/RC4 on cryptol....
+ciphers          : DES/AES/RC4
+total data(bits) : 16384
+Real time        : 13m41.770s/7m49.091s/0m39.281s
+User time        : 13m38.715s/7m47.416s/0m38.939s
+Sys  time        : 0m2.146s/0m1.055s/0m0.141s
+
+INFO: evaluate DES/AES/RC4 on scadl....
+ciphers          : DES/AES/RC4
+total data(bits) : 16384
+Real time        : 0m0.828s/0m0.250s/0m0.041s
+User time        : 0m0.801s/0m0.225s/0m0.014s
+Sys  time        : 0m0.001s/0m0.000s/0m0.000s
+
+INFO: evaluate DES/AES/RC4 on mbedtls....
+ciphers          : DES/AES/RC4
+total data(bits) : 16384
+Real time        : 0m0.019s/0m0.019s/0m0.018s
+User time        : 0m0.001s/0m0.000s/0m0.000s
+Sys  time        : 0m0.000s/0m0.000s/0m0.000s

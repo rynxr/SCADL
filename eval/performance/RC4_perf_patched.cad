@@ -1,0 +1,59 @@
+// RC4 CADL
+let VKey = M[1,16,8].[0x00];
+
+let VPt = M[1,16,8].[0x00];
+
+let FKsa(VK,vlen) = begin
+  let VState = M[1,256,8].[0];
+  let VT = M[1,1,8].[0];
+  let Vj = M[1,257,8].[0];
+  loopup(vi=255) begin
+    set VState[0,vi,7:0] = vi
+  end;
+  loopup(vi=255) begin
+    set Vj[0,vi+1,7:0] = (Vj[0,vi,7:0] + VState[0,vi,7:0] + VK[0,vi % vlen,7:0]) % 256;
+	set VT[0,0,7:0] = VState[0,vi,7:0];
+	set VState[0,vi,7:0] = VState[0,Vj[0,vi+1,7:0],7:0];
+	set VState[0,Vj[0,vi+1,7:0],7:0] = VT[0,0,7:0];
+  end;
+  VState
+end
+
+let FRpga(VK, VPt, vklen, vdlen) = begin
+  let Vi = M[1,1,8].[0];
+  let Vj = M[1,1,8].[0];
+  let Vt = M[1,1,8].[0];
+  let VRet = M[1,vdlen,8].[0];
+  let VS = FKsa(VK, vklen);
+
+  loopup(vk=vdlen-1) begin
+    set Vi[0,0,7:0] = (Vi[0,0,7:0] + 1) % 256;
+    set Vj[0,0,7:0] = (Vj[0,0,7:0] + VS[0,Vi[0,0,7:0],7:0]) % 256;
+	set Vt[0,0,7:0] = VS[0,Vi[0,0,7:0],7:0];
+	set VS[0,Vi[0,0,7:0],7:0] = VS[0,Vj[0,0,7:0],7:0];
+	set VS[0,Vj[0,0,7:0],7:0] = Vt[0,0,7:0];
+	let vtmp = (VS[0,Vi[0,0,7:0],7:0] + VS[0,Vj[0,0,7:0],7:0]) % 256;
+	set VRet[0,vk,7:0] = VPt[0,vk,7:0] ^ VS[0,vtmp,7:0]
+  end;
+  VRet
+end
+
+// For performace evaluation
+let FPerfTest(vTimes) =  begin
+  let VRet = M[1,1,32].[0];
+  loopup(vi=vTimes) begin
+      loopup(vj=3) begin                  //FIXME: upto 1M*64 bits supported
+	    set VKey[0,vj,7:0] = (vi >> vj) & 0xff;
+	    set VPt[0,vj,7:0]  = (vi >> vj) & 0xff
+	  end;
+	  let VResTime = FKsa(VKey, 16);      // Note: cryptol RC4 only implement ksa
+	  //let VResTime = FRpga(VKey, VPt, 16);
+	  set VRet[0,0,31:0] = VRet[0,0,31:0] + VResTime[0,0,0:0]
+  end;
+  VRet
+end
+
+// TEST_TIMES: the times of run RC4 encryption of 256bit data
+//             Total Data(bits): TEST_TIMES * 256
+let VRes = FPerfTest(1); //Note: parameter to replaced by script
+eval $print(VRes);

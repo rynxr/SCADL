@@ -1,0 +1,149 @@
+// This is the Turing machine description in SCADL
+// Turing machine: https://en.wikipedia.org/wiki/Turing_machine
+// Reference Simulator: http://en.literateprograms.org/Turing_machine_simulator_%28OCaml%29
+
+// state: 0x00, 0x01, 0x02, 0x03, 0x04 0x05(HALT)
+// input: 0x61('a') 0x62('b') 0x23('#')
+// direction: 0x4c('L') 0x52('R')
+
+let vzero  = 0x00;
+let vone   = 0x01;
+let vtwo   = 0x02;
+let vthree = 0x03;
+let vfour  = 0x04;
+let vfive  = 0x05;
+let vleft  = 0x4c;
+let vright = 0x52;
+let va     = 0x61;
+let vb     = 0x62;
+let vsharp = 0x23;
+
+//cs: current state ri: read input ns:next state wi:write state ts:tape shift
+// Finit State Machine
+let VFSM = M[10,5,8].[
+  //cs    ri      ns      wi      ts
+  vzero,  vsharp, vfour,  vsharp, vright,
+  vzero,  va,     vone,   vsharp, vright,
+  vfour,  vsharp, vfive,  vsharp, vright,
+  vone,   va,     vone,   va,     vright,
+  vone,   vb,     vone,   vb,     vright,
+  vone,   vsharp, vtwo,   vsharp, vleft,
+  vtwo,   vb,     vthree, vsharp, vleft,
+  vthree, va,     vthree, va,     vleft,
+  vthree, vb,     vthree, vb,     vleft,
+  vthree, vsharp, vzero,  vsharp, vright
+];
+
+let fSymbolAt(VTape,vPos,vBlank) = begin
+  let vTapeLen = VTape.y;
+  if (vPos >= vTapeLen) begin
+    vBlank
+  end else begin
+    VTape[0,vPos,7:0]
+  end
+end
+
+let FReplaceSymbol(VTape,vPos,vSymbol) = begin
+  let vLen = VTape.y;
+  let vLenRet = begin
+	  if (vPos == vLen) begin // append to the end
+	    vLen+1;
+	  end else begin          // overwirte middle
+	    vLen
+	  end
+  end;
+  let VRet = M[1,vLenRet,8].[0x00];
+  loopup(vCnt=(vLenRet-1)) begin
+    if (vCnt == vPos) begin
+      set VRet[0,vCnt,7:0] = vSymbol
+	end else begin
+      set VRet[0,vCnt,7:0] = VTape[0,vCnt,7:0];
+	end
+  end;
+  VRet
+end
+
+// whether arrive at final HALT state
+let fAcceptState(VStates,vState) = begin
+  let vY = VStates.y;
+  let VRes = M[1,1,8].[0x00];
+  loopup(vCnt0=(vY-1)) begin
+    if (VStates[0,vCnt0,7:0] == vState) begin
+        set VRes[0,0,7:0] = 0x01
+	end
+  end;
+  let vRet = VRes[0,0,7:0];
+  vRet
+end
+
+let FTransState(VStates,vState,vSymbol) = begin
+  let vX = VStates.x;
+  let VRes = M[1,3,8].[0xff];
+
+  loopup(vCnt=(vX-1)) begin
+    if ((VStates[vCnt,0,7:0] == vState)
+		&& (VStates[vCnt,1,7:0] == vSymbol)) begin
+	  set VRes[0,0,7:0] = VStates[vCnt,2,7:0]; //New State
+	  set VRes[0,1,7:0] = VStates[vCnt,3,7:0]; //New Symbol
+	  set VRes[0,2,7:0] = VStates[vCnt,4,7:0]  //New direction
+	end
+  end;
+  VRes
+end
+
+let fTrace(VTape,vState,vHeadPos,vBlank,vMaxLen) = begin
+  let vCurTapeLen = VTape.y;
+  let vTraceLen = begin
+    if (vCurTapeLen + 2 >= vMaxLen) begin
+	  vCurTapeLen + 2
+	end else begin
+	  vMaxLen
+	end
+  end;
+  let VTrace = M[1,vTraceLen,8].[0x00];
+  loopup(vCnt=(vCurTapeLen-1)) begin
+    set VTrace[0,vCnt+2,7:0] = VTape[0,vCnt,7:0]
+  end;
+  set VTrace[0,0,7:0] = vState;
+  set VTrace[0,1,7:0] = vHeadPos;
+  $print(VTrace)
+end
+
+let fSimulate(VTape,VAccepts,VStates,vState,vHeadPos,vBlank) = begin
+  fTrace(VTape,vState,vHeadPos,vBlank,16); //80 = 78 + 2
+  let vRet = begin
+    if (vState == 0xff) begin // fail at any instruction?
+      0xff
+    end else begin
+      if (0x01==fAcceptState(VAccepts,vState)) begin // HALT state?
+        0x01
+      end else begin // normal simulate instructions
+        let vSymbol   = fSymbolAt(VTape,vHeadPos,vBlank);
+        let VNewState = FTransState(VStates,vState,vSymbol);
+        let vNState   = VNewState[0,0,7:0];
+        let vNSymbol  = VNewState[0,1,7:0];
+        let VNTape    = FReplaceSymbol(VTape,vHeadPos,vNSymbol);
+ 
+        let vNDir     = VNewState[0,2,7:0];
+        let vNHeadPos = begin
+          if (vNDir == vleft) begin
+            vHeadPos - 1
+          end else begin
+            vHeadPos + 1
+          end;
+        end;
+ 
+        //recursive simulation
+        fSimulate(VNTape,VAccepts,VStates,vNState,vNHeadPos,vBlank)
+      end
+    end
+  end;
+  vRet
+end
+
+
+// TuringTest:
+let VInitTape   = M[1,2,8].[va, vb];
+let VAcptStates = M[1,1,8].[vfive];
+let vTuringTestRes = fSimulate(VInitTape,VAcptStates,VFSM,vzero,0,vsharp);
+eval $print(vTuringTestRes);

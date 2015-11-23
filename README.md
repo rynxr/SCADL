@@ -33,6 +33,14 @@ eval $(./bin/opam config env)
 which ocaml
 ```
 
+#### ncurse
+```
+wget http://ftp.gnu.org/gnu/ncurses/ncurses-6.0.tar.gz
+tar -zxvf ncurses-6.0.tar.gz && cd ncurse-6.0
+./configure --prefix=$SCADLDIR
+make && make install
+```
+
 #### GMP
 ```
 cd $SCADLDIR
@@ -40,6 +48,39 @@ wget http://ftp.gnu.org/gnu/gmp/gmp-4.2.4.tar.gz
 tar -zxvf gmp-4.2.4.tar.gz && cd gmp-4.2.4
 ./configure --enable-shared=no --prefix=$SCADLDIR
 make && make check && make install
+```
+
+#### GHC
+```
+wget https://www.haskell.org/ghc/dist/7.8.4/ghc-7.8.4-i386-unknown-linux-centos65.tar.bz2
+tar -jxvf ghc-7.8.4-i386-unknown-linux-centos65.tar.bz2
+cd ghc-7.8.4
+./configure CPPFLAGS=$SCADLDIR/include LDFLAGS=$SCADLDIR/lib --prefix=$SCADLDIR
+make install
+```
+
+#### cabal-install
+```
+wget http://hackage.haskell.org/package/cabal-install-1.22.0.0/cabal-install-1.22.0.0.tar.gz
+tar -zxvf cabal-install-1.22.0.0.tar.gz
+cd cabal-install-1.22.0.0
+```
+patch bootstrap.sh `Setup` compilation with following command
+```
+{GHC} -I$INSTDIR/include -L$INSTDIR/lib --make Setup -o Setup
+```
+
+```
+PREFIX=$INSTDIR EXTRA_CONFIGURE_OPTS="--extra-include-dirs $INSTDIR/include --extra-lib-dirs $INSTDIR/lib" ./bootstrap.sh
+cabal update
+export PATH=~/.cabal/bin:$PATH
+```
+
+#### cryptol-src
+```
+cd $SCADLDIR
+wget https://github.com/GaloisInc/cryptol/archive/v2.2.5.tar.gz
+tar -zxvf v2.2.5.tar.gz && cd cd cryptol-2.2.5
 ```
 
 #### gperf
@@ -76,7 +117,7 @@ contrib/get-antlr-3.4
 make && make check && make install
 ```
 
-#### cryptol
+#### cryptol-bin
 ```
 cd $SCADLDIR
 wget https://github.com/GaloisInc/cryptol/releases/download/v2.2.5/cryptol-2.2.5-CentOS6-32.tar.gz

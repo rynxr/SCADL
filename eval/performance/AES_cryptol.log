@@ -1,0 +1,36 @@
+Loading module Cryptol
+Loading module Cryptol
+Loading module AES
+[warning] at ./AES.cry:156:1--159:39:
+  Defaulting type parameter 'bits'
+             of finite enumeration
+             at ./AES.cry:156:36--156:51
+  to 4
+[warning] at ./AES.cry:156:1--159:39:
+  Defaulting type parameter 'bits'
+             of literal or demoted expression
+             at ./AES.cry:156:60--156:63
+  to 4
+[warning] at ./AES.cry:133:1--133:9:
+  Defaulting type parameter 'bits'
+             of literal or demoted expression
+             at ./AES.cry:136:32--136:33
+  to 3
+[warning] at ./AES.cry:100:1--102:23:
+  Defaulting type parameter 'bits'
+             of finite enumeration
+             at ./AES.cry:101:61--101:69
+  to 2
+[warning] at ./AES.cry:95:1--97:20:
+  Defaulting type parameter 'bits'
+             of finite enumeration
+             at ./AES.cry:96:58--96:66
+  to 2
+[[0x66e94bd4ef8a2c3b884cfa59ca342b2e,
+  0x0545aad56da2a97c3663d1432a3d1c84],
+ [0x58e2fccefa7e3061367f1d57a4e7455a,
+  0xa17e9f69e4f25a8b8620b4af78eefd6f]]
+
+real	0m0.446s
+user	0m0.237s
+sys	0m0.032s

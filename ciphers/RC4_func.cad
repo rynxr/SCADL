@@ -1,0 +1,48 @@
+// RC4 CADL
+// "Key": 0x4B 65 79 
+let VKey = M[1,3,8].[
+  0x4B, 0x65, 0x79
+];
+
+// "Plaintext": 0x50 6C 61 69 6E 74 65 78 74 
+let VPt = M[1,9,8].[
+  0x50, 0x6C, 0x61, 0x69, 0x6E, 0x74, 0x65, 0x78, 0x74
+];
+
+let FKsa(VK,vlen) = begin
+  let VState = M[1,256,8].[0];
+  let VT = M[1,1,8].[0];
+  let Vj = M[1,257,8].[0];
+  loopup(vi=255) begin
+    set VState[0,vi,7:0] = vi
+  end;
+  loopup(vi=255) begin
+    set Vj[0,vi+1,7:0] = (Vj[0,vi,7:0] + VState[0,vi,7:0] + VK[0,vi % vlen,7:0]) % 256;
+	set VT[0,0,7:0] = VState[0,vi,7:0];
+	set VState[0,vi,7:0] = VState[0,Vj[0,vi+1,7:0],7:0];
+	set VState[0,Vj[0,vi+1,7:0],7:0] = VT[0,0,7:0];
+  end;
+  VState
+end
+
+let FRpga(VK, VPt, vklen, vdlen) = begin
+  let Vi = M[1,1,8].[0];
+  let Vj = M[1,1,8].[0];
+  let Vt = M[1,1,8].[0];
+  let VRet = M[1,vdlen,8].[0];
+  let VS = FKsa(VK, vklen);
+
+  loopup(vk=vdlen-1) begin
+    set Vi[0,0,7:0] = (Vi[0,0,7:0] + 1) % 256;
+    set Vj[0,0,7:0] = (Vj[0,0,7:0] + VS[0,Vi[0,0,7:0],7:0]) % 256;
+	set Vt[0,0,7:0] = VS[0,Vi[0,0,7:0],7:0];
+	set VS[0,Vi[0,0,7:0],7:0] = VS[0,Vj[0,0,7:0],7:0];
+	set VS[0,Vj[0,0,7:0],7:0] = Vt[0,0,7:0];
+	let vtmp = (VS[0,Vi[0,0,7:0],7:0] + VS[0,Vj[0,0,7:0],7:0]) % 256;
+	set VRet[0,vk,7:0] = VPt[0,vk,7:0] ^ VS[0,vtmp,7:0]
+  end;
+  VRet
+end
+
+let VRes = FRpga(VKey, VPt, 3, 9);
+eval $output(VRes);
