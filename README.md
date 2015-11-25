@@ -153,7 +153,7 @@ This project is free for edcution and research.
 
 Welcome your requirments and suggestions.
 
-Jinli Rao <ary.xsnow@gmail.com>
+JLR <ary.xsnow@gmail.com>
 
 ## References
 
