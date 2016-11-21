@@ -1,10 +1,11 @@
 // This is the Turing machine description in SCADL
-// Turing machine: https://en.wikipedia.org/wiki/Turing_machine
-// Reference Simulator: http://en.literateprograms.org/Turing_machine_simulator_%28OCaml%29
+// Classic Turing Machine for language {a^nb^n | n>=1}
+// Please refer to the state transition diagram in the same directory for more details
 
 // state: 0x00, 0x01, 0x02, 0x03, 0x04 0x05(HALT)
 // input: 0x61('a') 0x62('b') 0x23('#')
 // direction: 0x4c('L') 0x52('R')
+// result: 1=pass ff=fail
 
 let vzero  = 0x00;
 let vone   = 0x01;
@@ -16,22 +17,27 @@ let vleft  = 0x4c;
 let vright = 0x52;
 let va     = 0x61;
 let vb     = 0x62;
-let vsharp = 0x23;
+let vx     = 0x58;
+let vy     = 0x59;
+let vblank = 0x20;
 
 //cs: current state ri: read input ns:next state wi:write state ts:tape shift
 // Finit State Machine
 let VFSM = M[10,5,8].[
   //cs    ri      ns      wi      ts
-  vzero,  vsharp, vfour,  vsharp, vright,
-  vzero,  va,     vone,   vsharp, vright,
-  vfour,  vsharp, vfive,  vsharp, vright,
+  vzero,  va,     vone,   vx,     vright,
+  vzero,  vy,     vthree, vy,     vright,
+
   vone,   va,     vone,   va,     vright,
-  vone,   vb,     vone,   vb,     vright,
-  vone,   vsharp, vtwo,   vsharp, vleft,
-  vtwo,   vb,     vthree, vsharp, vleft,
-  vthree, va,     vthree, va,     vleft,
-  vthree, vb,     vthree, vb,     vleft,
-  vthree, vsharp, vzero,  vsharp, vright
+  vone,   vy,     vone,   vy,     vright,
+  vone,   vb,     vtwo,   vy,     vleft,
+
+  vtwo,   va,     vtwo,   va,     vleft,
+  vtwo,   vy,     vtwo,   vy,     vleft,
+  vtwo,   vx,     vzero,  vx,     vright,
+
+  vthree, vy,     vthree, vy,     vright,
+  vthree, vblank, vfour,  vblank, vright
 ];
 
 let fSymbolAt(VTape,vPos,vBlank) = begin
@@ -143,7 +149,7 @@ end
 
 
 // TuringTest:
-let VInitTape   = M[1,2,8].[va, vb];
-let VAcptStates = M[1,1,8].[vfive];
-let vTuringTestRes = fSimulate(VInitTape,VAcptStates,VFSM,vzero,0,vsharp);
+let VInitTape   = M[1,4,8].[va, va, vb, vb];
+let VAcptStates = M[1,1,8].[vfour];
+let vTuringTestRes = fSimulate(VInitTape,VAcptStates,VFSM,vzero,0,vblank);
 eval $print(vTuringTestRes);
