@@ -159,4 +159,9 @@ JLR <ary.xsnow@gmail.com>
 
 ## ChangeLog
 
+Mon Nov 21 06:05:03 PST 2016
+1. Update Turing Machine Model
+2. Minor updates of CADL.g4 
+
 Fri Oct  2 08:28:31 PDT 2015
+1. Initial version

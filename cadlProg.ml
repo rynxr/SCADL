@@ -20,9 +20,13 @@ let u_va = 0x61;;
 
 let u_vb = 0x62;;
 
-let u_vsharp = 0x23;;
+let u_vx = 0x58;;
 
-let u_VFSM = (cMatrixMake (10, 5, 8) [|u_vzero; u_vsharp; u_vfour; u_vsharp; u_vright; u_vzero; u_va; u_vone; u_vsharp; u_vright; u_vfour; u_vsharp; u_vfive; u_vsharp; u_vright; u_vone; u_va; u_vone; u_va; u_vright; u_vone; u_vb; u_vone; u_vb; u_vright; u_vone; u_vsharp; u_vtwo; u_vsharp; u_vleft; u_vtwo; u_vb; u_vthree; u_vsharp; u_vleft; u_vthree; u_va; u_vthree; u_va; u_vleft; u_vthree; u_vb; u_vthree; u_vb; u_vleft; u_vthree; u_vsharp; u_vzero; u_vsharp; u_vright|]);;
+let u_vy = 0x59;;
+
+let u_vblank = 0x20;;
+
+let u_VFSM = (cMatrixMake (10, 5, 8) [|u_vzero; u_va; u_vone; u_vx; u_vright; u_vzero; u_vy; u_vthree; u_vy; u_vright; u_vone; u_va; u_vone; u_va; u_vright; u_vone; u_vy; u_vone; u_vy; u_vright; u_vone; u_vb; u_vtwo; u_vy; u_vleft; u_vtwo; u_va; u_vtwo; u_va; u_vleft; u_vtwo; u_vy; u_vtwo; u_vy; u_vleft; u_vtwo; u_vx; u_vzero; u_vx; u_vright; u_vthree; u_vy; u_vthree; u_vy; u_vright; u_vthree; u_vblank; u_vfour; u_vblank; u_vright|]);;
 
 let rec u_fSymbolAt u_VTape u_vPos u_vBlank = begin
     let u_vTapeLen = (cY u_VTape) in
@@ -126,11 +130,11 @@ let rec u_fSimulate u_VTape u_VAccepts u_VStates u_vState u_vHeadPos u_vBlank = 
   u_vRet
 end;;
 
-let u_VInitTape = (cMatrixMake (1, 2, 8) [|u_va; u_vb|]);;
+let u_VInitTape = (cMatrixMake (1, 4, 8) [|u_va; u_va; u_vb; u_vb|]);;
 
-let u_VAcptStates = (cMatrixMake (1, 1, 8) [|u_vfive|]);;
+let u_VAcptStates = (cMatrixMake (1, 1, 8) [|u_vfour|]);;
 
-let u_vTuringTestRes = (u_fSimulate (u_VInitTape) (u_VAcptStates) (u_VFSM) (u_vzero) (0) (u_vsharp));;
+let u_vTuringTestRes = (u_fSimulate (u_VInitTape) (u_VAcptStates) (u_VFSM) (u_vzero) (0) (u_vblank));;
 
 
 let _= cPrintSvar u_vTuringTestRes "vTuringTestRes";;
