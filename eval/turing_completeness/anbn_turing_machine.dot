@@ -1,7 +1,6 @@
-digraph anbn_turing_machine {
-  
+digraph anbn_turing_machine {  
   rankdir = "LR";
-  Legend [shape=none, margin=0, label="q0/q1/q2/q3/q4: state\la/b:input\lX/Y/B:override chars"];
+  //Legend [shape=none, margin=0, label="q0/q1/q2/q3/q4: state\la/b:input\lX/Y/B:override chars"];
   Start [shape=none, margin=0];
   q0 [shape=circle];
   q1 [shape=circle];
@@ -18,7 +17,5 @@ digraph anbn_turing_machine {
 
   q0->q3[label="Y/Y, R"];
   q3->q3[label="Y/Y, R"];
-  q3->q4[label="B/B, R"];
-  
-  
+  q3->q4[label="B/B, R"];  
 }
