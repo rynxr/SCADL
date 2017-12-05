@@ -159,6 +159,14 @@ JLR <ary.xsnow@gmail.com>
 
 ## ChangeLog
 
+Tue Dec  5 17:17:10 CST 2017
+1. Clean SCADL definitions.
+
+Mon Nov 21 06:05:03 PST 2016
+
+1. Update Turing Machine Model
+2. Minor updates of CADL.g4 
+
 Mon Nov 21 06:05:03 PST 2016
 
 1. Update Turing Machine Model
