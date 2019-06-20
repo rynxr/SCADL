@@ -1,6 +1,6 @@
-# SCADL
+# dSCADL
 
-This depot includes Symmetric Cryptographic Algorithm Description Language(SCADL) implementation source and evaluation results.
+This depot includes dataflow based Symmetric Cryptographic Algorithm Description Language(SCADL) implementation source and evaluation results.
 
 SCADL is a Domain Specific Language to accelerate symmetric cipher explorations by enabling ciphers designers draw a cipher algorithm based on its data flow.
 
